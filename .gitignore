@@ -1,0 +1,5 @@
+doc/html
+queuetest.dSYM
+*.o
+queuetest
+simulator
