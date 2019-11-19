@@ -75,6 +75,12 @@ test: all
 	./queuetest
 	./examples.pl
 
+run-queuetest: queuetest
+	./queuetest
+
+run-$(PROGNAME): $(PROGNAME)
+	./examples.pl
+
 # Build the documentation for the project
 doc: $(DOXYGENCONF) $(CFILES)
 	doxygen $(DOXYGENCONF)
