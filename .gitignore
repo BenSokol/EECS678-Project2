@@ -1,5 +1,13 @@
+# Documentation
 doc/html
-queuetest.dSYM
+
+# Object Files
 *.o
+
+# queuetest
 queuetest
+queuetest.dSYM
+
+# simulator
 simulator
+simulator.dSYM
