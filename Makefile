@@ -84,8 +84,6 @@ run-$(PROGNAME): $(PROGNAME)
 # Build the documentation for the project
 doc: $(DOXYGENCONF) $(CFILES)
 	doxygen $(DOXYGENCONF)
-
-publish: doc
 ifeq (, $(shell which rsync))
 	$(warning "No rsync in $(PATH), consider doing apt-get install rsync")
 else
@@ -129,4 +127,4 @@ unsubmit: $(SUBMISSION).zip
 clean:
 	-rm -rf $(PROGNAME) queuetest obj *~ $(SUBMISSION)* doc/html queuetest.dSYM simulator.dSYM
 
-.PHONY: all test submit unsubmit testsubmit doc clean
+.PHONY: all test submit unsubmit testsubmit doc clean run-queuetest run-$(PROGNAME)
