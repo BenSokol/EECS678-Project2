@@ -15,7 +15,7 @@ void priqueue_print(priqueue_t *q, char *str) {
   unsigned int i = 0;
   while (root != NULL) {
     printf("q[%d] = %d, (at = %p, next = %p)\n", i, (*(int *)root->data), root, root->next);
-    i++;
+    ++i;
     root = root->next;
   }
 #else
@@ -67,7 +67,7 @@ unsigned int priqueue_offer(priqueue_t *q, void *ptr) {
   while (temp != NULL && q->comparer(temp->data, node->data) < 0) {
     parent = temp;
     temp = temp->next;
-    index++;
+    ++index;
   }
 
   if (index == 0) {
@@ -82,7 +82,7 @@ unsigned int priqueue_offer(priqueue_t *q, void *ptr) {
   }
 
   // Increment size and return index of new node
-  q->size++;
+  ++q->size;
 
 
   priqueue_print(q, "priqueue_offer, end");
@@ -135,7 +135,7 @@ void *priqueue_poll(priqueue_t *q) {
   priqueue_print(q, "priqueue_poll, end");
 
   // Decrease size
-  q->size--;
+  --q->size;
 
   // Return data
   return data;
@@ -208,8 +208,8 @@ unsigned int priqueue_remove(priqueue_t *q, void *ptr) {
       temp = NULL;
 
       // Decrement size and increment count of removed nodes
-      q->size--;
-      removed++;
+      --q->size;
+      ++removed;
 
       // Look at next node
       if (parent == NULL) {
@@ -258,12 +258,12 @@ void *priqueue_remove_at(priqueue_t *q, unsigned int index) {
         // Looking at node other than root. Set parent->next to temp->next
         parent->next = temp->next;
       }
-      q->size--;
+      --q->size;
       break;
     }
     parent = temp;
     temp = temp->next;
-    current_position++;
+    ++current_position;
   }
 
   return temp;
