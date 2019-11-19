@@ -85,6 +85,13 @@ run-$(PROGNAME): $(PROGNAME)
 doc: $(DOXYGENCONF) $(CFILES)
 	doxygen $(DOXYGENCONF)
 
+publish: doc
+ifeq (, $(shell which rsync))
+	$(warning "No rsync in $(PATH), consider doing apt-get install rsync")
+else
+	rsync -aPh doc/html/* docs/
+endif
+
 # Quickly build a submission then extract it. Useful for testing if
 # we will be able to build your project from the code you gave us
 testsubmit: submit unsubmit
