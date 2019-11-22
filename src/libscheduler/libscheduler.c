@@ -10,11 +10,9 @@
 #include "../libpriqueue/libpriqueue.h"
 
 
-/**
-  Stores information making up a job to be scheduled including any statistics.
+static priqueue_t queue;
 
-  You may need to define some global variables or a struct to store your job queue elements.
-*/
+
 typedef struct _job_t {
 } job_t;
 
@@ -28,7 +26,8 @@ typedef struct _job_t {
     - You may assume that cores is a positive, non-zero number.
     - You may assume that scheme is a valid scheduling scheme.
 
-  @param cores the number of cores that is available by the scheduler. These cores will be known as core(id=0), core(id=1), ..., core(id=cores-1).
+  @param cores the number of cores that is available by the scheduler.
+   These cores will be known as core(id=0), core(id=1), ..., core(id=cores-1).
   @param scheme  the scheduling scheme that should be used. This value will be one of the six enum values of scheme_t
 */
 void scheduler_start_up(int cores, scheme_t scheme) {
@@ -63,7 +62,8 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
 /**
   Called when a job has completed execution.
 
-  The core_id, job_number and time parameters are provided for convenience. You may be able to calculate the values with your own data structure.
+  The core_id, job_number and time parameters are provided for convenience.
+    You may be able to calculate the values with your own data structure.
   If any job should be scheduled to run on the core free'd up by the
   finished job, return the job_number of the job that should be scheduled to
   run on core core_id.
@@ -101,7 +101,8 @@ int scheduler_quantum_expired(int core_id, int time) {
   Returns the average waiting time of all jobs scheduled by your scheduler.
 
   Assumptions:
-    - This function will only be called after all scheduling is complete (all jobs that have arrived will have finished and no new jobs will arrive).
+    - This function will only be called after all scheduling is complete
+      (all jobs that have arrived will have finished and no new jobs will arrive).
   @return the average waiting time of all jobs scheduled.
  */
 float scheduler_average_waiting_time() {
@@ -113,7 +114,8 @@ float scheduler_average_waiting_time() {
   Returns the average turnaround time of all jobs scheduled by your scheduler.
 
   Assumptions:
-    - This function will only be called after all scheduling is complete (all jobs that have arrived will have finished and no new jobs will arrive).
+    - This function will only be called after all scheduling is complete
+      (all jobs that have arrived will have finished and no new jobs will arrive).
   @return the average turnaround time of all jobs scheduled.
  */
 float scheduler_average_turnaround_time() {
@@ -125,7 +127,8 @@ float scheduler_average_turnaround_time() {
   Returns the average response time of all jobs scheduled by your scheduler.
 
   Assumptions:
-    - This function will only be called after all scheduling is complete (all jobs that have arrived will have finished and no new jobs will arrive).
+    - This function will only be called after all scheduling is complete
+      (all jobs that have arrived will have finished and no new jobs will arrive).
   @return the average response time of all jobs scheduled.
  */
 float scheduler_average_response_time() {
@@ -147,7 +150,12 @@ void scheduler_clean_up() {
   This function may print out any debugging information you choose. This
   function will be called by the simulator after every call the simulator
   makes to your scheduler.
-  In our provided output, we have implemented this function to list the jobs in the order they are to be scheduled. Furthermore, we have also listed the current state of the job (either running on a given core or idle). For example, if we have a non-preemptive algorithm and job(id=4) has began running, job(id=2) arrives with a higher priority, and job(id=1) arrives with a lower priority, the output in our sample output will be:
+  In our provided output, we have implemented this function to list the
+    jobs in the order they are to be scheduled. Furthermore, we have also
+    listed the current state of the job (either running on a given core or idle).
+    For example, if we have a non-preemptive algorithm and job(id=4) has began running,
+    job(id=2) arrives with a higher priority, and job(id=1) arrives with a lower priority,
+    the output in our sample output will be:
 
     2(-1) 4(0) 1(-1)
 
