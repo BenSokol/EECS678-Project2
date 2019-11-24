@@ -131,6 +131,7 @@ void *priqueue_poll(priqueue_t *q) {
 
   // Delete temp (old root of queue)
   free(temp);
+  temp = NULL;
 
   priqueue_print(q, "priqueue_poll, end");
 
@@ -180,12 +181,6 @@ void *priqueue_at(priqueue_t *q, unsigned int index) {
 */
 unsigned int priqueue_remove(priqueue_t *q, void *ptr) {
   unsigned int removed = 0;
-
-  // Return 0 if priqueue is empty
-  if (q->size == 0) {
-    return removed;
-  }
-
   node_t *temp = q->root;
   node_t *parent = NULL;
 
@@ -241,11 +236,9 @@ unsigned int priqueue_remove(priqueue_t *q, void *ptr) {
   @return NULL if the specified index does not exist
 */
 void *priqueue_remove_at(priqueue_t *q, unsigned int index) {
-  if (q->size <= index)
-    return NULL;
-
   node_t *temp = q->root;
   node_t *parent = NULL;
+  void *data = NULL;
   unsigned int current_position = 0;
 
   while (temp != NULL) {
@@ -258,6 +251,9 @@ void *priqueue_remove_at(priqueue_t *q, unsigned int index) {
         // Looking at node other than root. Set parent->next to temp->next
         parent->next = temp->next;
       }
+      data = temp->data;
+      free(temp);
+      temp = NULL;
       --q->size;
       break;
     }
@@ -266,7 +262,7 @@ void *priqueue_remove_at(priqueue_t *q, unsigned int index) {
     ++current_position;
   }
 
-  return temp;
+  return data;
 }
 
 
@@ -288,7 +284,6 @@ unsigned int priqueue_size(priqueue_t *q) {
 */
 void priqueue_destroy(priqueue_t *q) {
   while (q->size > 0) {
-    void *temp = priqueue_remove_at(q, 0);
-    free(temp);
+    priqueue_remove_at(q, 0);
   }
 }

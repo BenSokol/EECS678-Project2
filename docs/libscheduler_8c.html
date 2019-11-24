@@ -92,7 +92,9 @@ $(document).ready(function(){initNavTree('libscheduler_8c.html','');});
 <div class="title">libscheduler.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;assert.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="libscheduler_8h_source.html">libscheduler.h</a>&quot;</code><br />
@@ -105,9 +107,27 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5dad2df1b25832a1438546974e337cbc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libscheduler_8c.html#a5dad2df1b25832a1438546974e337cbc">scheduler_start_up</a> (int cores, <a class="el" href="libscheduler_8h.html#a4a9a6481e652361e21cee179b9a5412d">scheme_t</a> scheme)</td></tr>
-<tr class="memdesc:a5dad2df1b25832a1438546974e337cbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initalizes the scheduler.  <a href="libscheduler_8c.html#a5dad2df1b25832a1438546974e337cbc">More...</a><br /></td></tr>
-<tr class="separator:a5dad2df1b25832a1438546974e337cbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3afb6e6a7223b3fb99651e6bbdcb019d"><td class="memItemLeft" align="right" valign="top"><a id="a3afb6e6a7223b3fb99651e6bbdcb019d"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>fcfs</b> (const void *a, const void *b)</td></tr>
+<tr class="separator:a3afb6e6a7223b3fb99651e6bbdcb019d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af21025ff9ed1a462b4fca9be935eb05c"><td class="memItemLeft" align="right" valign="top"><a id="af21025ff9ed1a462b4fca9be935eb05c"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>sjf</b> (const void *a, const void *b)</td></tr>
+<tr class="separator:af21025ff9ed1a462b4fca9be935eb05c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af84e15fe9b6fb246efba860b9e457bd3"><td class="memItemLeft" align="right" valign="top"><a id="af84e15fe9b6fb246efba860b9e457bd3"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>psjf</b> (const void *a, const void *b)</td></tr>
+<tr class="separator:af84e15fe9b6fb246efba860b9e457bd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bba03e001d6b5f072b5ba620265b60c"><td class="memItemLeft" align="right" valign="top"><a id="a3bba03e001d6b5f072b5ba620265b60c"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>pri</b> (const void *a, const void *b)</td></tr>
+<tr class="separator:a3bba03e001d6b5f072b5ba620265b60c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50a283f32bf059ad1e7b4a10e205b496"><td class="memItemLeft" align="right" valign="top"><a id="a50a283f32bf059ad1e7b4a10e205b496"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>ppri</b> (const void *a, const void *b)</td></tr>
+<tr class="separator:a50a283f32bf059ad1e7b4a10e205b496"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a233b79ba1c40303d2bd13217a7812946"><td class="memItemLeft" align="right" valign="top"><a id="a233b79ba1c40303d2bd13217a7812946"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>rr</b> (const void *a, const void *b)</td></tr>
+<tr class="separator:a233b79ba1c40303d2bd13217a7812946"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3a2471646c3b476ef6d88d0eaec2671"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libscheduler_8c.html#ae3a2471646c3b476ef6d88d0eaec2671">scheduler_start_up</a> (int _cores, <a class="el" href="libscheduler_8h.html#a4a9a6481e652361e21cee179b9a5412d">scheme_t</a> _scheme)</td></tr>
+<tr class="memdesc:ae3a2471646c3b476ef6d88d0eaec2671"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initalizes the scheduler.  <a href="libscheduler_8c.html#ae3a2471646c3b476ef6d88d0eaec2671">More...</a><br /></td></tr>
+<tr class="separator:ae3a2471646c3b476ef6d88d0eaec2671"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a102ab9a6713a66a68933f84d0308cd2f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libscheduler_8c.html#a102ab9a6713a66a68933f84d0308cd2f">scheduler_new_job</a> (int job_number, int time, int running_time, int priority)</td></tr>
 <tr class="memdesc:a102ab9a6713a66a68933f84d0308cd2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when a new job arrives.  <a href="libscheduler_8c.html#a102ab9a6713a66a68933f84d0308cd2f">More...</a><br /></td></tr>
 <tr class="separator:a102ab9a6713a66a68933f84d0308cd2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -393,8 +413,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5dad2df1b25832a1438546974e337cbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5dad2df1b25832a1438546974e337cbc">&#9670;&nbsp;</a></span>scheduler_start_up()</h2>
+<a id="ae3a2471646c3b476ef6d88d0eaec2671"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3a2471646c3b476ef6d88d0eaec2671">&#9670;&nbsp;</a></span>scheduler_start_up()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -403,13 +423,13 @@ Functions</h2></td></tr>
           <td class="memname">void scheduler_start_up </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>cores</em>, </td>
+          <td class="paramname"><em>_cores</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="libscheduler_8h.html#a4a9a6481e652361e21cee179b9a5412d">scheme_t</a>&#160;</td>
-          <td class="paramname"><em>scheme</em>&#160;</td>
+          <td class="paramname"><em>_scheme</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

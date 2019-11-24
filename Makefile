@@ -1,9 +1,9 @@
 # Change this line before submission
-STUDENTLASTNAMES = Student1-Student2
+STUDENTLASTNAMES = BenSokol-ShogunThomas
 PROGNAME = simulator
 
 CC = gcc --std=gnu11
-CFLAGS = -Wall -g
+CFLAGS = -Wall -Wextra -g
 
 
 ####################################################################
@@ -85,7 +85,7 @@ run-$(PROGNAME): $(PROGNAME)
 doc: $(DOXYGENCONF) $(CFILES)
 	doxygen $(DOXYGENCONF)
 ifeq (, $(shell which rsync))
-	$(warning "No rsync in $(PATH), consider doing apt-get install rsync")
+	$(warning "No rsync in $(PATH), unable to publish docs. Consider doing apt-get install rsync")
 else
 	rsync -aPh doc/html/* docs/
 endif

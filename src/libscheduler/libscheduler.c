@@ -1,6 +1,8 @@
 /** @file libscheduler.c
  */
 
+#include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,11 +12,81 @@
 #include "../libpriqueue/libpriqueue.h"
 
 
+typedef struct _job_t {
+  int id;
+  float arrival_time;
+  float running_time;
+  float remaining_time;
+  int priority;
+} job_t;
+
+
+static float total_waiting_time;
+static float total_response_time;
+static float total_turnaround_time;
+static unsigned int total_finished_jobs;
+static unsigned int cores;
+static job_t **core_arr;
+static scheme_t scheme;
 static priqueue_t queue;
 
 
-typedef struct _job_t {
-} job_t;
+int fcfs(const void *a, const void *b) {
+  (void)a;
+  (void)b;
+  return 1;
+}
+
+
+int sjf(const void *a, const void *b) {
+  job_t const *lhs = (job_t *)a;
+  job_t const *rhs = (job_t *)b;
+
+  if (lhs->running_time != rhs->running_time) {
+    return lhs->running_time - rhs->running_time;
+  }
+  else {
+    return lhs->arrival_time - rhs->arrival_time;
+  }
+}
+
+
+int psjf(const void *a, const void *b) {
+  job_t const *lhs = (job_t *)a;
+  job_t const *rhs = (job_t *)b;
+
+  if (lhs->remaining_time != rhs->remaining_time) {
+    return lhs->remaining_time - rhs->remaining_time;
+  }
+  else {
+    return lhs->arrival_time - rhs->arrival_time;
+  }
+}
+
+
+int pri(const void *a, const void *b) {
+  job_t const *lhs = (job_t *)a;
+  job_t const *rhs = (job_t *)b;
+
+  if (lhs->priority != rhs->priority) {
+    return lhs->priority - rhs->priority;
+  }
+  else {
+    return lhs->arrival_time - rhs->arrival_time;
+  }
+}
+
+
+int ppri(const void *a, const void *b) {
+  return pri(a, b);
+}
+
+
+int rr(const void *a, const void *b) {
+  (void)a;
+  (void)b;
+  return 1;
+}
 
 
 /**
@@ -30,7 +102,39 @@ typedef struct _job_t {
    These cores will be known as core(id=0), core(id=1), ..., core(id=cores-1).
   @param scheme  the scheduling scheme that should be used. This value will be one of the six enum values of scheme_t
 */
-void scheduler_start_up(int cores, scheme_t scheme) {
+void scheduler_start_up(int _cores, scheme_t _scheme) {
+  assert(_cores > 0);
+  cores = (unsigned int)_cores;
+  scheme = _scheme;
+
+  int (*comparer)(const void *, const void *) = NULL;
+
+  switch (scheme) {
+    case FCFS:
+      comparer = fcfs;
+      break;
+    case SJF:
+      comparer = sjf;
+      break;
+    case PSJF:
+      comparer = psjf;
+      break;
+    case PRI:
+      comparer = pri;
+      break;
+    case PPRI:
+      comparer = ppri;
+      break;
+    case RR:
+      comparer = rr;
+      break;
+    default:
+      assert(false);
+      break;
+  }
+
+  priqueue_init(&queue, comparer);
+  core_arr = (job_t **)malloc(cores * sizeof(job_t *));
 }
 
 
@@ -55,6 +159,10 @@ void scheduler_start_up(int cores, scheme_t scheme) {
 
  */
 int scheduler_new_job(int job_number, int time, int running_time, int priority) {
+  (void)job_number;
+  (void)time;
+  (void)running_time;
+  (void)priority;
   return -1;
 }
 
@@ -75,6 +183,9 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
   @return -1 if core should remain idle.
  */
 int scheduler_job_finished(int core_id, int job_number, int time) {
+  (void)core_id;
+  (void)job_number;
+  (void)time;
   return -1;
 }
 
@@ -93,6 +204,8 @@ int scheduler_job_finished(int core_id, int job_number, int time) {
   @return -1 if core should remain idle
  */
 int scheduler_quantum_expired(int core_id, int time) {
+  (void)core_id;
+  (void)time;
   return -1;
 }
 
@@ -106,7 +219,12 @@ int scheduler_quantum_expired(int core_id, int time) {
   @return the average waiting time of all jobs scheduled.
  */
 float scheduler_average_waiting_time() {
-  return 0.0;
+  if (total_finished_jobs == 0) {
+    return 0.0;
+  }
+  else {
+    return total_waiting_time / (float)total_finished_jobs;
+  }
 }
 
 
@@ -119,7 +237,12 @@ float scheduler_average_waiting_time() {
   @return the average turnaround time of all jobs scheduled.
  */
 float scheduler_average_turnaround_time() {
-  return 0.0;
+  if (total_finished_jobs == 0) {
+    return 0.0;
+  }
+  else {
+    return total_turnaround_time / (float)total_finished_jobs;
+  }
 }
 
 
@@ -132,7 +255,12 @@ float scheduler_average_turnaround_time() {
   @return the average response time of all jobs scheduled.
  */
 float scheduler_average_response_time() {
-  return 0.0;
+  if (total_finished_jobs == 0) {
+    return 0.0;
+  }
+  else {
+    return total_response_time / (float)total_finished_jobs;
+  }
 }
 
 
@@ -143,6 +271,16 @@ float scheduler_average_response_time() {
     - This function will be the last function called in your library.
 */
 void scheduler_clean_up() {
+  priqueue_destroy(&queue);
+
+  for (unsigned int i = 0; i < cores; ++i) {
+    if (core_arr[i] != NULL) {
+      free(core_arr[i]);
+      core_arr[i] = NULL;
+    }
+  }
+
+  free(core_arr);
 }
 
 
