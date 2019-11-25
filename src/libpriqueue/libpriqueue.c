@@ -6,11 +6,10 @@
 
 #include "libpriqueue.h"
 
-
-void priqueue_print(priqueue_t *q, char *str);
 void priqueue_print(priqueue_t *q, char *str) {
-#ifdef DEBUG
-  printf("Printing priqueue: %s\n", str);
+  if (str != NULL) {
+    printf("Printing priqueue: %s\n", str);
+  }
   node_t *root = q->root;
   unsigned int i = 0;
   while (root != NULL) {
@@ -18,10 +17,6 @@ void priqueue_print(priqueue_t *q, char *str) {
     ++i;
     root = root->next;
   }
-#else
-  (void)q;
-  (void)str;
-#endif
 }
 
 
@@ -53,10 +48,12 @@ void priqueue_init(priqueue_t *q, int (*comparer)(const void *, const void *)) {
 unsigned int priqueue_offer(priqueue_t *q, void *ptr) {
   unsigned int index = 0;
 
+#ifdef DEBUG
   priqueue_print(q, "priqueue_offer, beg");
+#endif
 
   // Create new node and assign data
-  node_t *node = malloc(sizeof(node_t));
+  node_t *node = (node_t *)malloc(sizeof(node_t));
   node->data = ptr;
   node->next = NULL;
 
@@ -84,8 +81,9 @@ unsigned int priqueue_offer(priqueue_t *q, void *ptr) {
   // Increment size and return index of new node
   ++q->size;
 
-
+#ifdef DEBUG
   priqueue_print(q, "priqueue_offer, end");
+#endif
 
   return index;
 }
@@ -118,7 +116,9 @@ void *priqueue_poll(priqueue_t *q) {
     return NULL;
   }
 
+#ifdef DEBUG
   priqueue_print(q, "priqueue_poll, beg");
+#endif
 
   // Set temp to root of priqueue
   node_t *temp = q->root;
@@ -133,7 +133,9 @@ void *priqueue_poll(priqueue_t *q) {
   free(temp);
   temp = NULL;
 
+#ifdef DEBUG
   priqueue_print(q, "priqueue_poll, end");
+#endif
 
   // Decrease size
   --q->size;
@@ -184,7 +186,9 @@ unsigned int priqueue_remove(priqueue_t *q, void *ptr) {
   node_t *temp = q->root;
   node_t *parent = NULL;
 
+#ifdef DEBUG
   priqueue_print(q, "priqueue_remove, beg");
+#endif
 
   while (temp != NULL) {
     // Check if temp->data is equal to ptr
@@ -220,7 +224,9 @@ unsigned int priqueue_remove(priqueue_t *q, void *ptr) {
     }
   }
 
+#ifdef DEBUG
   priqueue_print(q, "priqueue_remove, end");
+#endif
 
   return removed;
 }

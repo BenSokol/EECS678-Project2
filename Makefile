@@ -3,6 +3,8 @@ STUDENTLASTNAMES = BenSokol-ShogunThomas
 PROGNAME = simulator
 
 CC = gcc --std=gnu11
+CXX = g++ --std=c++11
+CXXFLAGS = -Wall -Wextra -g
 CFLAGS = -Wall -Wextra -g
 
 
@@ -65,10 +67,14 @@ $(PROGNAME)-inner: $(OFILES)
 $(OBJDIR)%.o: $(SRCDIR)%.c $(HFILES)
 	$(CC) $(CFLAGS) -c $(INCDIRS) -o $@ $< $(LIBS)
 
+# Generic build target for all compilation units. NOTE: Changing a
+# header requires you to rebuild the entire project
+$(OBJDIR)%.o: $(SRCDIR)%.cpp $(HFILES)
+	$(CXX) $(CXXFLAGS) -c $(INCDIRS) -o $@ $< $(LIBS)
+
 # Build a testing harness for the priority queue
-queuetest: $(OBJINNERDIRS) queuetest-inner
-queuetest-inner: ./src/queuetest.c ./src/libpriqueue/libpriqueue.c
-	$(CC) $(CFLAGS) $^ -o queuetest $(LIBLIST)
+queuetest: $(OBJINNERDIRS) obj/queuetest.o obj/libpriqueue/libpriqueue.o
+	$(CXX) $(CXXFLAGS) -o queuetest obj/libpriqueue/libpriqueue.o obj/queuetest.o $(LIBLIST)
 
 # Build and run the program
 test: all
@@ -76,7 +82,7 @@ test: all
 	./examples.pl
 
 run-queuetest: queuetest
-	./queuetest
+	./queuetest -s
 
 run-$(PROGNAME): $(PROGNAME)
 	./examples.pl

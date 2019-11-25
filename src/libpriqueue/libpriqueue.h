@@ -4,6 +4,10 @@
 #ifndef LIBPRIQUEUE_H_
 #define LIBPRIQUEUE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct node_t;
 struct priqueue_t;
 
@@ -47,5 +51,11 @@ void *priqueue_remove_at(priqueue_t *q, unsigned int index);
 unsigned int priqueue_size(priqueue_t *q);
 
 void priqueue_destroy(priqueue_t *q);
+
+void priqueue_print(priqueue_t *q, char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LIBPQUEUE_H_ */
