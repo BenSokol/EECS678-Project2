@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['examples_4',['Examples',['../examplesPage.html',1,'']]],
-  ['eecs_20678_3a_20project_202_3a_20scheduler_5',['EECS 678: Project 2: Scheduler',['../index.html',1,'']]]
+  ['data_4',['data',['../structnode__t.html#a6796d8702c5d9f710a6656d38d39afc6',1,'node_t']]],
+  ['doxygen_5',['Doxygen',['../doxygen.html',1,'']]]
 ];

@@ -13,7 +13,26 @@
 #include "../libpriqueue/libpriqueue.h"
 
 
-typedef struct _job_t {
+/** @struct job_t
+ *  @brief job_t node structure
+ *  @var job_t::id
+ *  Member 'id' contains the id of this job (constant).
+ *  @var job_t::arrival_time
+ *  Member 'arrival_time' contains the arrival time of this job (constant).
+ *  @var job_t::running_time
+ *  Member 'running_time' contains the total running time of this job (constant).
+ *  @var job_t::remaining_time
+ *  Member 'remaining_time' contains the current remaining time of this job.
+ *  @var job_t::priority
+ *  Member 'priority' contains the priority of this job (constant).
+ *  @var job_t::core_number
+ *  Member 'core_number' contains the current core running this job.
+ *  @var job_t::start_time
+ *  Member 'start_time' contains the first start time of this job. This is used to calculate the response time.
+ *  @var job_t::last_updated_time
+ *  Member 'last_updated_time' contains the last time this job's remaining time was updated.
+ */
+typedef struct job_t {
   int id;
   float arrival_time;
   float running_time;
@@ -24,23 +43,78 @@ typedef struct _job_t {
   int last_updated_time;
 } job_t;
 
-
+/**
+ * \var static float total_waiting_time;
+ * \brief Total waiting time
+ */
 static float total_waiting_time;
+
+/**
+ * \var static float total_response_time;
+ * \brief Total response time
+ */
 static float total_response_time;
+
+/**
+ * \var static float total_turnaround_time;
+ * \brief Total turnaround time
+ */
 static float total_turnaround_time;
+
+/**
+ * \var static unsigned int total_finished_jobs;
+ * \brief Total finished jobs
+ */
 static unsigned int total_finished_jobs;
+
+/**
+ * \var static unsigned int cores;
+ * \brief Number of cores this scheduler will use
+ */
 static unsigned int cores;
+
+/**
+ * \var static job_t **core_arr;
+ * \brief Array of job_t pointers representing a processor with n cores
+ */
 static job_t **core_arr;
+
+/**
+ * \var static scheme_t scheme;
+ * \brief What scheme to use
+ */
 static scheme_t scheme;
+
+/**
+ * \var static priqueue_t queue;
+ * \brief Priority queue to hold jobs
+ */
 static priqueue_t queue;
 
-
+/**
+* Compare function for First Come First Serve (FCFS)
+*
+* @param a a pointer to the lhs job_t
+* @param b a pointer to the rhs job_t
+* @return -1
+*
+* See also @ref comparer-page
+*/
 int fcfs(const void *a, const void *b) {
   (void)a;
   (void)b;
   return -1;
 }
 
+/**
+* Compare function for Shortest Job First (SJF)
+*
+* @param a a pointer to the lhs job_t
+* @param b a pointer to the rhs job_t
+* @return lhs->running_time - rhs->running_time, unless running times are the same, then lhs->arrival_time - rhs->arrival_time.
+*
+* See also @ref comparer-page
+*/
 int sjf(const void *a, const void *b) {
   job_t const *lhs = (job_t *)a;
   job_t const *rhs = (job_t *)b;
@@ -53,7 +127,15 @@ int sjf(const void *a, const void *b) {
   }
 }
 
-
+/**
+* Compare function for Preemptive Shortest Job First (PSJF)
+*
+* @param a a pointer to the lhs job_t
+* @param b a pointer to the rhs job_t
+* @return lhs->remaining_time - rhs->remaining_time, unless remaining times are the same, then lhs->arrival_time - rhs->arrival_time.
+*
+* See also @ref comparer-page
+*/
 int psjf(const void *a, const void *b) {
   job_t const *lhs = (job_t *)a;
   job_t const *rhs = (job_t *)b;
@@ -66,7 +148,15 @@ int psjf(const void *a, const void *b) {
   }
 }
 
-
+/**
+* Compare function for Priority (PRI)
+*
+* @param a a pointer to the lhs job_t
+* @param b a pointer to the rhs job_t
+* @return lhs->priority - rhs->priority, unless priorities are the same, then lhs->arrival_time - rhs->arrival_time.
+*
+* See also @ref comparer-page
+*/
 int pri(const void *a, const void *b) {
   job_t const *lhs = (job_t *)a;
   job_t const *rhs = (job_t *)b;
@@ -79,12 +169,28 @@ int pri(const void *a, const void *b) {
   }
 }
 
-
+/**
+* Compare function for Preemptive Priority (PPRI)
+*
+* @param a a pointer to the lhs job_t
+* @param b a pointer to the rhs job_t
+* @return lhs->priority - rhs->priority, unless priorities are the same, then lhs->arrival_time - rhs->arrival_time.
+*
+* See also @ref comparer-page
+*/
 int ppri(const void *a, const void *b) {
   return pri(a, b);
 }
 
-
+/**
+* Compare function for First Come First Serve (FCFS)
+*
+* @param a a pointer to the lhs job_t
+* @param b a pointer to the rhs job_t
+* @return -1
+*
+* See also @ref comparer-page
+*/
 int rr(const void *a, const void *b) {
   (void)a;
   (void)b;
@@ -101,9 +207,9 @@ int rr(const void *a, const void *b) {
     - You may assume that cores is a positive, non-zero number.
     - You may assume that scheme is a valid scheduling scheme.
 
-  @param cores the number of cores that is available by the scheduler.
+  @param _cores the number of cores that is available by the scheduler.
    These cores will be known as core(id=0), core(id=1), ..., core(id=cores-1).
-  @param scheme  the scheduling scheme that should be used. This value will be one of the six enum values of scheme_t
+  @param _scheme  the scheduling scheme that should be used. This value will be one of the six enum values of scheme_t
 */
 void scheduler_start_up(int _cores, scheme_t _scheme) {
   assert(_cores > 0);

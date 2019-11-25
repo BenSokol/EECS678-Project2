@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['data_2',['data',['../structnode__t.html#a6796d8702c5d9f710a6656d38d39afc6',1,'node_t']]],
-  ['doxygen_3',['Doxygen',['../doxygen.html',1,'']]]
+  ['comparer_1',['comparer',['../structpriqueue__t.html#abb7c0b7892da24100fb161bccf6802e9',1,'priqueue_t']]],
+  ['compare_20function_2',['Compare Function',['../comparer-page.html',1,'']]],
+  ['core_5fnumber_3',['core_number',['../structjob__t.html#a8b91286f04012f65281e77ec9c9d6ee9',1,'job_t']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['compare_20function_69',['Compare Function',['../comparer-page.html',1,'']]]
+  ['compare_20function_97',['Compare Function',['../comparer-page.html',1,'']]]
 ];

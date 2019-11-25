@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['comparer_63',['comparer',['../structpriqueue__t.html#abb7c0b7892da24100fb161bccf6802e9',1,'priqueue_t']]]
+  ['arrival_5ftime_83',['arrival_time',['../structjob__t.html#a7892327b55fbd2f3ce332182712b2dfb',1,'job_t']]]
 ];

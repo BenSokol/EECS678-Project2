@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['size_67',['size',['../structpriqueue__t.html#a2e30576303bfaf9e7e3adf933d20f95c',1,'priqueue_t']]]
+  ['last_5fupdated_5ftime_88',['last_updated_time',['../structjob__t.html#a47ff04811ff0c69c22bbcb3257899196',1,'job_t']]]
 ];
