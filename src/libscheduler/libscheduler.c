@@ -18,6 +18,8 @@ typedef struct _job_t {
   float running_time;
   float remaining_time;
   int priority;
+  int core_number;
+  int start_time;
 } job_t;
 
 
@@ -25,6 +27,7 @@ static float total_waiting_time;
 static float total_response_time;
 static float total_turnaround_time;
 static unsigned int total_finished_jobs;
+static unsigned int job_id;
 static unsigned int cores;
 static job_t **core_arr;
 static scheme_t scheme;
@@ -36,7 +39,6 @@ int fcfs(const void *a, const void *b) {
   (void)b;
   return 1;
 }
-
 
 int sjf(const void *a, const void *b) {
   job_t const *lhs = (job_t *)a;
@@ -154,15 +156,86 @@ void scheduler_start_up(int _cores, scheme_t _scheme) {
   @param time the current time of the simulator.
   @param running_time the total number of time units this job will run before it will be finished.
   @param priority the priority of the job. (The lower the value, the higher the priority.)
-  @return index of core job should be scheduled on
+  @return index of core that the job should be scheduled on
   @return -1 if no scheduling changes should be made.
 
  */
 int scheduler_new_job(int job_number, int time, int running_time, int priority) {
+
   (void)job_number;
   (void)time;
   (void)running_time;
   (void)priority;
+
+  job_t* toAdd = (job_t*)malloc(sizeof(job_t));
+
+  toAdd->id = job_number;
+  toAdd->arrival_time = time;
+  toAdd->running_time = running_time;
+  toAdd->remaining_time = running_time;
+  toAdd->priority = priority;
+  toAdd->core_number = -1;
+  toAdd->start_time = -1;
+
+  int index = priqueue_offer(&queue, toAdd);
+
+  if(index <= cores - 1)
+  {
+    if(cores == 1)
+    {
+      if(core_arr[0] == NULL)
+      {
+        core_arr[0] = toAdd;
+        toAdd->core_number = 0;
+        toAdd->start_time = time;
+        return 0;
+      }
+      else if(scheme == PSJF || scheme == PPRI)
+      {
+        if(index == 0)
+        {
+          job_t* t1 = (job_t*)priqueue_at(&queue, 1);
+
+          if(time - t1->start_time == 0)
+          {
+            t1->start_time = -1;
+          }
+          else
+          {
+            t1->running_time -= time - t1->start_time;
+          }
+          t1->core_number = -1;
+          core_arr[0] = toAdd;
+          toAdd->core_number = 0;
+          toAdd->start_time = time;
+          return 0;
+        }
+        else
+        {
+          return -1;
+        }
+      }
+      else
+      {
+        return -1;
+      }
+    }
+    else //n number of cores
+    {
+      int length = sizeof(core_arr) / sizeof(core_arr[0]);
+
+      for(int i = 0; i < length; i++)
+      {
+        if(core_arr[i] == NULL)
+        {
+          core_arr[i] = toAdd;
+          toAdd->core_number = i;
+          toAdd->start_time = time;
+          return i;
+        }
+      }
+    }
+  }
   return -1;
 }
 
@@ -185,7 +258,7 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
 int scheduler_job_finished(int core_id, int job_number, int time) {
   (void)core_id;
   (void)job_number;
-  (void)time;
+
   return -1;
 }
 
@@ -206,6 +279,7 @@ int scheduler_job_finished(int core_id, int job_number, int time) {
 int scheduler_quantum_expired(int core_id, int time) {
   (void)core_id;
   (void)time;
+
   return -1;
 }
 
