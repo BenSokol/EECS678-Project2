@@ -20,8 +20,8 @@ typedef struct _job_t {
   float remaining_time;
   int priority;
   int core_number;
-  int first_start_time;
-  int last_start_time;
+  int start_time;
+  int last_updated_time;
 } job_t;
 
 
@@ -177,31 +177,29 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
   toAdd->remaining_time = running_time;
   toAdd->priority = priority;
   toAdd->core_number = -1;
-  toAdd->first_start_time = -1;
-  toAdd->last_start_time = -1;
+  toAdd->start_time = -1;
+  toAdd->last_updated_time = -1;
 
   if (scheme == PSJF) {
     // Preemptive Shortest Job First
     for (unsigned int i = 0; i < cores; ++i) {
       if (core_arr[i] != NULL) {
-        core_arr[i]->remaining_time -= time - core_arr[i]->last_start_time;
+        core_arr[i]->remaining_time -= time - core_arr[i]->last_updated_time;
+        core_arr[i]->last_updated_time = time;
       }
     }
   }
 
   unsigned int index = priqueue_offer(&queue, toAdd);
 
-  fprintf(stdout, ">>>Adding Job: %d to index %u", toAdd->id, index);
-
   if (index < cores) {
     // Attempt to add to core_arr, if available spot
     for (unsigned int i = 0; i < cores; ++i) {
       if (core_arr[i] == NULL) {
         toAdd->core_number = i;
-        toAdd->first_start_time = time;
-        toAdd->last_start_time = time;
+        toAdd->start_time = time;
+        toAdd->last_updated_time = time;
         core_arr[i] = toAdd;
-        fprintf(stdout, " starting on core %d\n", i);
         return i;
       }
     }
@@ -221,12 +219,12 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
         }
         if (longestTimeRemaining > toAdd->remaining_time) {
           core_arr[core_to_run_on]->core_number = -1;
-          if (core_arr[core_to_run_on]->first_start_time == time) {
-            core_arr[core_to_run_on]->first_start_time = -1;
+          if (core_arr[core_to_run_on]->start_time == time) {
+            core_arr[core_to_run_on]->start_time = -1;
           }
           toAdd->core_number = core_to_run_on;
-          toAdd->first_start_time = time;
-          toAdd->last_start_time = time;
+          toAdd->start_time = time;
+          toAdd->last_updated_time = time;
           core_arr[core_to_run_on] = toAdd;
         }
       }
@@ -236,30 +234,27 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
         core_to_run_on = 0;
         for (unsigned int i = 0; i < cores; ++i) {
           if (core_arr[i]->priority > maxPriority) {
+            maxPriority = core_arr[i]->priority;
             core_to_run_on = i;
           }
         }
-
+        fprintf(stdout, ">>>maxPriority(%d) > toAdd->priority(%d)\n", maxPriority, toAdd->priority);
         if (maxPriority > toAdd->priority) {
           core_arr[core_to_run_on]->core_number = -1;
-          if (core_arr[core_to_run_on]->first_start_time == time) {
-            core_arr[core_to_run_on]->first_start_time = -1;
+          if (core_arr[core_to_run_on]->start_time == time) {
+            core_arr[core_to_run_on]->start_time = -1;
           }
           toAdd->core_number = core_to_run_on;
-          toAdd->first_start_time = time;
-          toAdd->last_start_time = time;
+          toAdd->start_time = time;
+          toAdd->last_updated_time = time;
           core_arr[core_to_run_on] = toAdd;
         }
       }
-
-      fprintf(stdout, " starting on core %d\n", core_to_run_on);
     }
 
-    fprintf(stdout, " starting on core -1\n");
     return core_to_run_on;
   }
 
-  fprintf(stdout, " starting on core -1\n");
   return -1;
 }
 
@@ -288,10 +283,10 @@ int scheduler_job_finished(int core_id, int job_number, int time) {
       job_t *job = priqueue_remove_at(&queue, i);
       assert(job->arrival_time != -1);
       assert(job->running_time != -1);
-      assert(job->first_start_time != -1);
-      assert(job->last_start_time != -1);
+      assert(job->start_time != -1);
+      assert(job->last_updated_time != -1);
       total_waiting_time += time - job->arrival_time - job->running_time;
-      total_response_time += job->first_start_time - job->arrival_time;
+      total_response_time += job->start_time - job->arrival_time;
       total_turnaround_time += time - job->arrival_time;
       total_finished_jobs++;
       free(job);
@@ -303,18 +298,16 @@ int scheduler_job_finished(int core_id, int job_number, int time) {
       job_t *job = priqueue_at(&queue, i);
       if (job->core_number == -1) {
         job->core_number = core_id;
-        if (job->first_start_time == -1) {
-          job->first_start_time = time;
+        if (job->start_time == -1) {
+          job->start_time = time;
         }
-        job->last_start_time = time;
+        job->last_updated_time = time;
         id = job->id;
         core_arr[core_id] = job;
         break;
       }
     }
   }
-
-  fprintf(stdout, ">>>Starting job %d\n", id);
 
   return id;
 }
@@ -351,10 +344,10 @@ int scheduler_quantum_expired(int core_id, int time) {
       job_t *job = priqueue_at(&queue, i);
       job->core_number = core_id;
       core_arr[core_id] = job;
-      if (job->first_start_time == -1) {
-        job->first_start_time = time;
+      if (job->start_time == -1) {
+        job->start_time = time;
       }
-      job->last_start_time = time;
+      job->last_updated_time = time;
       id = job->id;
       break;
     }
@@ -440,8 +433,20 @@ void scheduler_clean_up() {
   blank if you do not find it useful.
  */
 void scheduler_show_queue() {
-  for (unsigned int i = 0; i < priqueue_size(&queue); ++i) {
-    job_t *job = priqueue_at(&queue, i);
-    fprintf(stdout, "%u(%d) ", job->id, job->priority);
+  for (unsigned int i = 0; i < cores; ++i) {
+    if (core_arr[i] == NULL) {
+      fprintf(stdout, "\n");
+      return;
+    }
+    fprintf(stdout, "%u(%d) ", core_arr[i]->id, core_arr[i]->priority);
+    //fprintf(stdout, "\n\tJob %u - Priority:%d, Response:%f", job->id, job->priority, job->start_time - job->arrival_time);
   }
+
+  for (unsigned int i = cores; i < priqueue_size(&queue); ++i) {
+    job_t *job = priqueue_at(&queue, i);
+    assert(job->core_number == -1);
+    fprintf(stdout, "%u(%d) ", job->id, job->priority);
+    //fprintf(stdout, "\n\tJob %u - Priority:%d, Response:%f", job->id, job->priority, job->start_time - job->arrival_time);
+  }
+  fprintf(stdout, "\n");
 }
