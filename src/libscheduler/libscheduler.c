@@ -221,7 +221,9 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
         }
         if (longestTimeRemaining > toAdd->remaining_time) {
           core_arr[core_to_run_on]->core_number = -1;
-          // core_arr[core_to_run_on]->first_start_time = -1;
+          if (core_arr[core_to_run_on]->first_start_time == time) {
+            core_arr[core_to_run_on]->first_start_time = -1;
+          }
           toAdd->core_number = core_to_run_on;
           toAdd->first_start_time = time;
           toAdd->last_start_time = time;
@@ -240,16 +242,20 @@ int scheduler_new_job(int job_number, int time, int running_time, int priority) 
 
         if (maxPriority > toAdd->priority) {
           core_arr[core_to_run_on]->core_number = -1;
-          // core_arr[core_to_run_on]->first_start_time = -1;
+          if (core_arr[core_to_run_on]->first_start_time == time) {
+            core_arr[core_to_run_on]->first_start_time = -1;
+          }
           toAdd->core_number = core_to_run_on;
           toAdd->first_start_time = time;
           toAdd->last_start_time = time;
           core_arr[core_to_run_on] = toAdd;
         }
       }
+
+      fprintf(stdout, " starting on core %d\n", core_to_run_on);
     }
 
-    fprintf(stdout, " starting on core %d\n", core_to_run_on);
+    fprintf(stdout, " starting on core -1\n");
     return core_to_run_on;
   }
 
@@ -280,6 +286,10 @@ int scheduler_job_finished(int core_id, int job_number, int time) {
   for (unsigned int i = 0; i < priqueue_size(&queue); ++i) {
     if (((job_t *)priqueue_at(&queue, i))->id == job_number) {
       job_t *job = priqueue_remove_at(&queue, i);
+      assert(job->arrival_time != -1);
+      assert(job->running_time != -1);
+      assert(job->first_start_time != -1);
+      assert(job->last_start_time != -1);
       total_waiting_time += time - job->arrival_time - job->running_time;
       total_response_time += job->first_start_time - job->arrival_time;
       total_turnaround_time += time - job->arrival_time;
@@ -324,10 +334,33 @@ int scheduler_job_finished(int core_id, int job_number, int time) {
   @return -1 if core should remain idle
  */
 int scheduler_quantum_expired(int core_id, int time) {
-  (void)core_id;
-  (void)time;
+  int id = -1;
 
-  return -1;
+  for (unsigned int i = 0; i < priqueue_size(&queue); ++i) {
+    if (((job_t *)priqueue_at(&queue, i))->id == core_arr[core_id]->id) {
+      job_t *job = priqueue_remove_at(&queue, i);
+      job->core_number = -1;
+      core_arr[core_id] = NULL;
+      priqueue_offer(&queue, job);
+      break;
+    }
+  }
+
+  for (unsigned int i = 0; i < priqueue_size(&queue); ++i) {
+    if (((job_t *)priqueue_at(&queue, i))->core_number == -1) {
+      job_t *job = priqueue_at(&queue, i);
+      job->core_number = core_id;
+      core_arr[core_id] = job;
+      if (job->first_start_time == -1) {
+        job->first_start_time = time;
+      }
+      job->last_start_time = time;
+      id = job->id;
+      break;
+    }
+  }
+
+  return id;
 }
 
 
@@ -340,12 +373,7 @@ int scheduler_quantum_expired(int core_id, int time) {
   @return the average waiting time of all jobs scheduled.
  */
 float scheduler_average_waiting_time() {
-  if (total_finished_jobs == 0) {
-    return 0.0;
-  }
-  else {
-    return total_waiting_time / (float)total_finished_jobs;
-  }
+  return (total_finished_jobs == 0 ? 0.0 : total_waiting_time / (float)total_finished_jobs);
 }
 
 
@@ -358,12 +386,7 @@ float scheduler_average_waiting_time() {
   @return the average turnaround time of all jobs scheduled.
  */
 float scheduler_average_turnaround_time() {
-  if (total_finished_jobs == 0) {
-    return 0.0;
-  }
-  else {
-    return total_turnaround_time / (float)total_finished_jobs;
-  }
+  return (total_finished_jobs == 0 ? 0.0 : total_turnaround_time / (float)total_finished_jobs);
 }
 
 
@@ -376,12 +399,7 @@ float scheduler_average_turnaround_time() {
   @return the average response time of all jobs scheduled.
  */
 float scheduler_average_response_time() {
-  if (total_finished_jobs == 0) {
-    return 0.0;
-  }
-  else {
-    return total_response_time / (float)total_finished_jobs;
-  }
+  return (total_finished_jobs == 0 ? 0.0 : total_response_time / (float)total_finished_jobs);
 }
 
 

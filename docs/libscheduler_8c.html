@@ -93,6 +93,7 @@ $(document).ready(function(){initNavTree('libscheduler_8c.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;assert.h&gt;</code><br />
+<code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
@@ -344,7 +345,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>rr</b> (const void *a,
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>index of core job should be scheduled on </dd>
+<dl class="section return"><dt>Returns</dt><dd>index of core that the job should be scheduled on </dd>
 <dd>
 -1 if no scheduling changes should be made. </dd></dl>
 
